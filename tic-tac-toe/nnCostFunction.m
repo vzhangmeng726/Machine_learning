@@ -75,11 +75,12 @@ z3 = a2 * Theta2';
 a3 = sigmoid(z3);
 
 sizek = size(a3, 2);
-Y = zeros(m, sizek);
-onek = ones(m, sizek);
-for i = 1:m
-    Y(i, y(i)) = 1;
-end;
+%Y = zeros(m, sizek);
+%onek = ones(m, sizek);
+%for i = 1:m
+%    Y(i, y(i)) = 1;
+%end;
+Y = y
 
 J = -1/m * sum(sum(Y .* log(a3) + (onek .- Y).*log(onek.-a3)))...
         + lambda/(2*m) * (sum(sum((Theta1.^2)(:,2:end)))+sum(sum((Theta2.^2)(:,2:end))) );

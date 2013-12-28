@@ -1,0 +1,41 @@
+ran vs ran
+P1win=0.593333;P2win=0.284000;Draw=0.122667
+
+Hidden_size = 50
+//back
+P1win=0.299000;P2win=0.392000;Draw=0.309000
+ITER = 1000
+Data = open('data', 'w')
+Sat = [.0, .0, .0]
+P1mark = 1 
+P2mark = -1
+P1winmark = 1
+P2winmark = -1
+Drawmark = 0
+
+//first
+P1win=0.730333;P2win=0.250667;Draw=0.019000
+//back
+P1win=0.233000;P2win=0.520333;Draw=0.246667
+ITER = 3000
+Data = open('data', 'w')
+Sat = [.0, .0, .0]
+P1mark = 1 
+P2mark = -1
+P1winmark = 1
+P2winmark = -1
+Drawmark = 0
+
+
+ann vs ann
+P1win=0.000000;P2win=0.000000;Draw=1.000000
+
+
+base on this data
+//first:P1win=0.737333;P2win=0.240000;Draw=0.022667
+//back:P1win=0.308333;P2win=0.397333;Draw=0.294333
+
+
+Hidden_size = 100
+//back:P1win=0.314667;P2win=0.510000;Draw=0.175333
+//first:P1win=0.844667;P2win=0.125667;Draw=0.029667
