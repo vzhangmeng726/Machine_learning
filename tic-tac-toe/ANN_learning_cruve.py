@@ -8,7 +8,7 @@ from numpy import *
 import scipy.optimize as opt
 
 Input_size = 9
-Hidden_size = 10
+Hidden_size = 5
 Output_size = 9
 
 X = []
@@ -54,8 +54,7 @@ def roll(theta):
     theta2.shape = Output_size,-1
     return (theta1, theta2)
 
-def anncostfunction(theta):
-    global X, Y
+def anncostfunction(theta, X, Y):
     m = X.shape[0]
  
     theta1, theta2 = roll(theta)
@@ -69,8 +68,7 @@ def anncostfunction(theta):
 #J = -1/m * sum(sum(Y .* log(a3) + (onek .- Y).*log(onek.-a3)))...
 #        + lambda/(2*m) * (sum(sum((Theta1.^2)(:,2:end)))+sum(sum((Theta2.^2)(:,2:end))) );
 
-def anngrad(theta):
-    global X, Y
+def anngrad(theta, X, Y):
     m = X.shape[0]
 
     theta1, theta2 = roll(theta)
@@ -96,21 +94,86 @@ def anngrad(theta):
 
 #    print ans
     return ans
-    
+
+def predict(X, theta1, theta2):
+    H = sigmoid(dot(X, theta1.transpose()))
+    Y = sigmoid(dot(H, theta2.transpose()))
+
+    maxx = -1
+    for ind, val in enumerate(Y):
+        if (X[ind]==0) and (maxx==-1 or Y[maxx]<val):
+            maxx = ind
+#    print maxx
+    return maxx
+
+def calcaccurancy(X, Y, theta1, theta2):
+    cor = 0
+    m = 0
+   # print X.shape[0]
+    for ind in xrange(X.shape[0]):
+        x = X[ind]
+        y = Y[ind]
+        m += 1
+        if (sum(y)==0):
+            cor += 1
+        elif (sum(y)==1):
+            if (predict(x, theta1, theta2)==list(y).index(y.max())):
+                cor += 1
+    return cor*1.0/m
+
+def calcerror(X, Y, theta1, theta2):
+    acc = 0
+    for ind in xrange(X.shape[0]):
+        x = X[ind]
+        y = Y[ind]
+
+        H = sigmoid(dot(x, theta1.transpose()))
+        predicty = sigmoid(dot(H, theta2.transpose()))
+
+        acc += sum( (predicty-y)**2 )
+    return 0.5/X.shape[0]*acc
 
 if __name__ == '__main__':
     for line in open('data', 'r'):
         a ,b = eval(line)
         appenddata(a,b)
     X = array(X)
-    Y = array(Y) 
+    Y = array(Y)
 
     theta1 = randtheta(Input_size, Hidden_size)
     theta2 = randtheta(Hidden_size, Output_size)
     
-    theta = opt.fmin_bfgs(anncostfunction, unroll(theta1, theta2), maxiter=50, fprime=anngrad)
-    theta1, theta2 = roll(theta)
-    print l
+    cvm = 3000*0.2;
+    testm = 3000*0.2;
+    trainm = 3000*0.6;
+
+    trainX = X[:trainm]
+    trainY = Y[:trainm]
+    cvX = X[trainm:trainm+cvm]
+    cvY = Y[trainm:trainm+cvm]
+    testX = X[-testm:]
+    testY = Y[-testm:]
+
+#    print map(lambda x: list(x).index(1),Y)
+
+    cverror = []
+    testerror = []
+    num = []
+    i = 0
+    ind = 0
+    while i < int(trainm):
+        theta = opt.fmin_bfgs(anncostfunction, unroll(theta1, theta2), args=(testX[:i+1], testY[:i+1]), maxiter=50, fprime=anngrad, disp=False)
+        theta1, theta2 = roll(theta)
+        cverror.append(calcerror(cvX, cvY, theta1, theta2) )
+        testerror.append(calcerror(testX[:i+1], testY[:i+1], theta1, theta2) )
+        num.append(i)
+        print i,':',cverror[ind],';',testerror[ind]
+        i += 200
+        ind += 1
+
+    save('cverror', cverror)
+    save('testerror', testerror)
+    save('num', num)
 
     f = open('theta','w')
     f.write(repr(theta1)+','+repr(theta2))
