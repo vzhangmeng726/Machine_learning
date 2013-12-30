@@ -8,7 +8,7 @@ from numpy import *
 import scipy.optimize as opt
 
 Input_size = 9
-Hidden_size = 10
+Hidden_size = 50
 Output_size = 9
 
 X = []
@@ -65,20 +65,8 @@ def anncostfunction(theta):
     
     ans =  -1.0/m *  sum(Y*log(a3) + (1-Y)*log(1-a3))
 #    print ans,
-    return ans
 #J = -1/m * sum(sum(Y .* log(a3) + (onek .- Y).*log(onek.-a3)))...
 #        + lambda/(2*m) * (sum(sum((Theta1.^2)(:,2:end)))+sum(sum((Theta2.^2)(:,2:end))) );
-
-def anngrad(theta):
-    global X, Y
-    m = X.shape[0]
-
-    theta1, theta2 = roll(theta)
-
-    z2 = dot(X, theta1.transpose())
-    a2 = sigmoid(z2)
-    a3 = sigmoid(dot(a2, theta2.transpose()))
-
 #    print 'X=',X
 #    print 'Y=',Y
 
@@ -92,10 +80,10 @@ def anngrad(theta):
     theta1_grad = 1.0/m * dot(delta2.transpose(),X)
     theta2_grad = 1.0/m * dot(delta3.transpose(),a2)
 
-    ans = unroll(theta1_grad, theta2_grad)
+    ans2 = unroll(theta1_grad, theta2_grad)
 
 #    print ans
-    return ans
+    return (ans, ans2)
     
 
 if __name__ == '__main__':
@@ -108,9 +96,10 @@ if __name__ == '__main__':
     theta1 = randtheta(Input_size, Hidden_size)
     theta2 = randtheta(Hidden_size, Output_size)
     
-    theta = opt.fmin_bfgs(anncostfunction, unroll(theta1, theta2), maxiter=50, fprime=anngrad)
-    theta1, theta2 = roll(theta)
-    print l
+#    theta = opt.fmin_bfgs(anncostfunction, unroll(theta1, theta2), maxiter=100, fprime=anngrad)
+    theta = opt.minimize(anncostfunction, unroll(theta1, theta2),jac=True, method='L-BFGS-B',options={'disp':True,'maxiter':150})
+
+    theta1, theta2 = roll(theta.x)
 
     f = open('theta','w')
     f.write(repr(theta1)+','+repr(theta2))

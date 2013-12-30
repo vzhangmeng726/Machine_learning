@@ -8,7 +8,7 @@ from numpy import *
 import scipy.optimize as opt
 
 Input_size = 9
-Hidden_size = 5
+Hidden_size = 50
 Output_size = 9
 
 X = []
@@ -36,7 +36,19 @@ def randtheta(L_in, L_out):
     return theta
 
 def sigmoid(x):
-    return 1.0/(1.0+exp(-x))
+    try:
+        t = 1.0/(1.0+exp(-x))
+    except:
+        t = inf
+    return t
+
+def logx(x):
+    try:
+        t = log(x)
+    except:
+        print t
+        t = -inf
+    return t
 
 def sigmoidGradient(z):
     return sigmoid(z)*(1.0 - sigmoid(z));
@@ -55,20 +67,6 @@ def roll(theta):
     return (theta1, theta2)
 
 def anncostfunction(theta, X, Y):
-    m = X.shape[0]
- 
-    theta1, theta2 = roll(theta)
-    z2 = dot(X, theta1.transpose())
-    a2 = sigmoid(z2)
-    a3 = sigmoid(dot(a2, theta2.transpose()))
-    
-    ans =  -1.0/m *  sum(Y*log(a3) + (1-Y)*log(1-a3))
-#    print ans,
-    return ans
-#J = -1/m * sum(sum(Y .* log(a3) + (onek .- Y).*log(onek.-a3)))...
-#        + lambda/(2*m) * (sum(sum((Theta1.^2)(:,2:end)))+sum(sum((Theta2.^2)(:,2:end))) );
-
-def anngrad(theta, X, Y):
     m = X.shape[0]
 
     theta1, theta2 = roll(theta)
@@ -90,10 +88,11 @@ def anngrad(theta, X, Y):
     theta1_grad = 1.0/m * dot(delta2.transpose(),X)
     theta2_grad = 1.0/m * dot(delta3.transpose(),a2)
 
-    ans = unroll(theta1_grad, theta2_grad)
+    ans =  -1.0/m *sum(Y*logx(a3) + (1-Y)*logx(1-a3))
+    ans2 = unroll(theta1_grad, theta2_grad)
 
 #    print ans
-    return ans
+    return (ans,ans2)
 
 def predict(X, theta1, theta2):
     H = sigmoid(dot(X, theta1.transpose()))
@@ -162,13 +161,17 @@ if __name__ == '__main__':
     i = 0
     ind = 0
     while i < int(trainm):
-        theta = opt.fmin_bfgs(anncostfunction, unroll(theta1, theta2), args=(testX[:i+1], testY[:i+1]), maxiter=50, fprime=anngrad, disp=False)
-        theta1, theta2 = roll(theta)
+        theta = opt.minimize(anncostfunction, unroll(theta1, theta2), jac=True,\
+                args=(testX[:i+1],testY[:i+1]), \
+                method='L-BFGS-B', \
+                options={'disp':False})
+
+        theta1, theta2 = roll(theta.x)
         cverror.append(calcerror(cvX, cvY, theta1, theta2) )
         testerror.append(calcerror(testX[:i+1], testY[:i+1], theta1, theta2) )
         num.append(i)
         print i,':',cverror[ind],';',testerror[ind]
-        i += 200
+        i += 50
         ind += 1
 
     save('cverror', cverror)
