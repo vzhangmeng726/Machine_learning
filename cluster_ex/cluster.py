@@ -3,17 +3,17 @@ from scipy.cluster.vq import *
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+ClustersNum = 6
+
 def dec2hex(x):
     if (x==0):
         return '#000000'
     
     hexlist = '0123456789ABCDEF'
     s = ''
-    ind = 6
-    while (ind > 0):
+    for ind in xrange(6):
         s += hexlist[x % 16]
         x /= 16
-        ind -= 1
 #    print '#'+s
     return '#'+s        
 
