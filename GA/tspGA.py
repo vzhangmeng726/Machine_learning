@@ -17,7 +17,7 @@ def tsp_fitness_f(route):
         else:
             length += p2p(point, route[index+1])
 
-    return length
+    return length    
 
 def tsp_gen_init():
     global data

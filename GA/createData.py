@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from numpy import *
 
-DataSize = 20
+DataSize = 30
 DataDim = 2
 DataRange = 100
 
