@@ -3,19 +3,20 @@ import operator
 
 class KNN(object):
     
-    def __init__(self, train_x, train_y, test_x, k = 1):
+    def __init__(self, train_x, train_y, k = 3):
         self.train_x = train_x
         self.train_y = train_y
-        self.test_x = test_x
-        self.testSize = test_x.shape[0]
         self.trainSize = train_x.shape[0]
         self.k = k
 #        print self.train_x.shape
 #        print self.trainSize
         self.train()
 
-    def train(self):
+    def predict(self, test_x):
  
+        self.test_x = test_x
+        self.testSize = test_x.shape[0]
+
         self.predictions = zeros((self.trainSize, 1))
 
         for index, predictData in enumerate(self.test_x):
@@ -31,6 +32,4 @@ class KNN(object):
             sortedClassCount = sorted(classCount.iteritems(), key = operator.itemgetter(1), reverse = True)
             self.predictions[index] = sortedClassCount[0][0]
 
-    def result(self):
         return self.predictions
-

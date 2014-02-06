@@ -36,8 +36,7 @@ class GA(object):
         self.fit()
         return self.best_biont
     
-    def fit(self):
-        
+    def fit(self):        
         generation = [None] * self.generation_size
         fitness = [None] * self.generation_size
 
@@ -61,7 +60,6 @@ class GA(object):
             print '%03dth  generation|\tbest fitness:\t%lf|\tbest child fitness:\t%lf' % (iteration, self.best_fitness,fitness_max)
 
             if self.plot and iteration % self.plot_interval == 0:
-#                print '\rThe %03dth generation\t|\tbest fitness:\t %lf' % (iteration, self.best_fitness),
                 self.plot_f(best_child, 'red', False)            
                 self.plot_f(self.best_biont, 'blue', True)
 
@@ -78,9 +76,6 @@ class GA(object):
             survival_count = int( (1 - self.crossover_rate) * self.generation_size)
             next_gen_iter = 0
             selecting = sorted(random.rand(survival_count))
-#            print selecting
-#            print gen_pr
-#            print generation
             temp_sum = .0
             for index, biont in enumerate(generation):
                 temp_sum += gen_pr[index]
@@ -110,7 +105,7 @@ class GA(object):
                 mutation_gen = random.randint(0, self.generation_size)
                 next_generation[mutation_gen] = self.mutation_f(next_generation[mutation_gen])
 
-            #generation change
+            #inherit
             generation = copy(next_generation)
             fitness_max = None
             for i in xrange(self.generation_size):

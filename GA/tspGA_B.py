@@ -1,3 +1,4 @@
+
 import matplotlib.pyplot as plt
 from time import sleep
 from numpy import *
@@ -79,7 +80,31 @@ def tsp_crossover_HGA(father, mother):
         ind += 1
     return child
 
+def tsp_crossover_mixed(father, mather):
+    if random.rand()>0.4:
+        return tsp_crossover_HGA(father, mather)
+    else:
+        return tsp_crossover_f1(father, mather)
+
+
+def tsp_mutation_hillclimb(base):
+    ori_fitness = tsp_fitness_f(base)
+    while True:
+#        posx = random.randint(0,len(base))
+#        posy = random.randint(0,len(base))
+#        t = copy(base[posx])
+#        base[posx] = copy(base[posy])
+#        base[posy] = copy(t)
+        base = tsp_gen_init()
+
+        if tsp_fitness_f(base)>ori_fitness:
+            break;
+    return base
+
+
+
 def tsp_mutation_f(base):
+#    if random.rand()<0.2: return tsp_gen_init()
     for i in xrange(random.randint(0,len(base))):
         posx = random.randint(0,len(base))
         posy = random.randint(0,len(base))
@@ -120,8 +145,8 @@ if __name__ == '__main__':
 #    fig = plt.figure()
     plt.ion()
     plt.show()
-
-    MyGA = ga.GA(tsp_fitness_f, {'fitness_thresold':550}, 500, tsp_gen_init,
-        0.9, tsp_crossover_HGA, 0.2, tsp_mutation_f, True, tsp_plot_f, 200, lambda a,b: a<b)
+    
+    MyGA = ga.GA(tsp_fitness_f, {'fitness_thresold':0}, 300, tsp_gen_init,
+        0.9, tsp_crossover_HGA, 0.3, tsp_mutation_f, True, tsp_plot_f, 10, lambda a,b: a<b)
     MyGA.fit()
 

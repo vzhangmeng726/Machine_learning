@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 from numpy import *
 
-DataSize = 30
+DataSize = 20
 DataDim = 2
-DataRange = 100
+DataRange = 1000
 
 if __name__ == '__main__':
     data = random.rand(DataSize, DataDim) * 100
