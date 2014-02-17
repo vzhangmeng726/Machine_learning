@@ -57,6 +57,9 @@ def testHandWritingClass():
     print "step 1: load data..."  
     train_x, train_y, test_x, test_y = loadDataSet()  
 
+    from pickle import dump
+    dump((train_x, train_y, test_x, test_y), open('digital.dat','wb'), True)
+
 #    print train_x[0].shape
 #    print test_x[0].shape
   
@@ -86,4 +89,4 @@ def testHandWritingClass():
 
 if __name__ == '__main__':
     testHandWritingClass();
-
+   
