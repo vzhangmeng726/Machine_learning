@@ -29,4 +29,3 @@ if __name__ == '__main__':
 
     pprint(new_d)
     pic.dump(new_d, open('shrinked_200_3.dat','wb'), True)
-

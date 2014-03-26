@@ -1,13 +1,10 @@
-function patches = sampleIMAGES()
+function patches = sampleIMAGES(patchsize)
 % sampleIMAGES
 % Returns 10000 patches for training
 
 load IMAGES;    % load images from disk 
 
-IMAGES(:, :, 1)
-imagesc(IMAGES(:, :,1))
-
-patchsize = 4;  % we'll use 8x8 patches 
+%patchsize = 2;  % we'll use 8x8 patches 
 numpatches = 10000;
 
 % Initialize patches with zeros.  Your code will fill in this matrix--one
@@ -69,9 +66,13 @@ function patches = normalizeData(patches)
 
 % Remove DC (mean of images). 
 patches = bsxfun(@minus, patches, mean(patches));
+size(patches)
+size(mean(patches))
+
 
 % Truncate to +/-3 standard deviations and scale to -1 to 1
 pstd = 3 * std(patches(:));
+size(pstd)
 patches = max(min(patches, pstd), -pstd) / pstd;
 
 % Rescale from [-1,1] to [0.1,0.9]

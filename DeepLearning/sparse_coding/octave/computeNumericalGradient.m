@@ -20,7 +20,7 @@ numgrad = zeros(size(theta));
 
 
 EPSILON = 1e-4;
-for i = 1 : length(theta)/500
+for i = 1 : 10
     add = theta;
     add(i) = add(i) + EPSILON;
     sub = theta;

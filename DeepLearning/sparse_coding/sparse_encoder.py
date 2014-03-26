@@ -35,7 +35,7 @@ class sparseEncoder(object):
         return 1/(1+exp(-z))
 
     def __init__(self, visible_size, hidden_size = 16,
-                     lmbd = 0.0001, sparse_para = 0.01, beta = 3, ops = {'maxiter':10000, 'disp':True}):
+                     lmbd = 0.0001, sparse_para = 0.01, beta = 3, ops = {'maxiter':400, 'disp':True}):
 
         self.ops = ops
         self.hs = hidden_size
@@ -60,7 +60,7 @@ class sparseEncoder(object):
         self.x = x
         self.result = minimize(self.costf, x0 = self.theta,
                         method = 'L-BFGS-B', jac = True,
-                        options = self.ops)
+                        options = self.ops, tol = 1e-100)
         self.theta = self.result.x
    
     def costf(self, theta):
@@ -121,13 +121,13 @@ class sparseEncoder(object):
         delta2 = (dot(delta3, W2.T) + delta_kl)  * a2 * (1-a2)
 #        print 'delta2', delta2
 
-        W2grad = dot(a2.T, delta3)
+        W2grad = dot(a2.T, delta3)/m + self.lmbd * W2
 #        print 'W2grad', W2grad
-        b2grad = sum(delta3, 0)
+        b2grad = sum(delta3, 0)/m
 #        print 'b2grad', b2grad
-        W1grad = dot(a1.T, delta2)
+        W1grad = dot(a1.T, delta2)/m + self.lmbd * W1
 #        print 'W1grad', W1grad
-        b1grad = sum(delta2, 0)
+        b1grad = sum(delta2, 0)/m
 #        print 'b1grad', b1grad
 
         grad = concatenate((W1grad.flatten(), W2grad.flatten(), b1grad, b2grad))        
@@ -152,11 +152,14 @@ class sparseEncoder(object):
 
 if __name__ == '__main__':
     test_grad( lambda x: x[0] ** 3 - 2 * x[1], array([1., 2.]), array([3., -2.]) )
-    x = rap.load_data(num = 1000, dim = 8)
+    x = rap.load_data(num = 20000, dim = 10)
     cl = sparseEncoder(x.shape[1])
     cl.fit(x)     
     cl.visualize_hidden_layer()
 
 #====================gradient check with octave is neglected=================
-#    cost, grad = cl.costf(cl.theta)
+#    cl = sparseEncoder(4, 10)
+#    cl.x = ones((2, 4))
+#    cl.theta = ones((94))
+#    cost, grad = cl.costf(cl.theta)   
 #    test_grad( lambda x: cl.costf(x)[0], cl.theta, grad, 6)

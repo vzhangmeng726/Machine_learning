@@ -44,37 +44,45 @@ b2grad = zeros(size(b2));
 % 
 [ndims, m] = size(data);
 
-a1 = data
+a1 = data;
 %'marker1'
-z2 = W1 * a1 .+ repmat(b1, 1, size(a1)(2))
+z2 = W1 * a1 .+ repmat(b1, 1, size(a1)(2));
 %'marker2'
-a2 = sigmoid(z2)
+a2 = sigmoid(z2);
 %'marker3'
-z3 = W2 * a2 .+ repmat(b2, 1, size(a2)(2))
+z3 = W2 * a2 .+ repmat(b2, 1, size(a2)(2));
 %'marker4'
-a3 = sigmoid(z3)
+a3 = sigmoid(z3);
 
-muls = sum(a2, 2) / size(a2)(2)
-para = sparsityParam
-kl = sum( para .* log(para ./ muls) .+ (1 - para) .* log( (1- para) ./ ( 1-muls)) )
+muls = sum(a2, 2) / size(a2)(2);
+para = sparsityParam;
+kl = sum( para .* log(para ./ muls) .+ (1 - para) .* log( (1- para) ./ ( 1-muls)) );
 
 
 cost = .5 / m * sum( ((a3 .- data) .**2)(:) ) .+ ...
         lambda * .5 * sum([(W1.**2)(:),(W2.**2)(:)](:)) .+ ...
-        beta * kl
+        beta * kl;
 
-delta3 = -(data - a3) .* a3 .* (1 - a3)
-delta_kl = beta * (-para./muls .+ (1-para)./(1-muls))
+delta3 = -(data - a3) .* a3 .* (1 - a3);
+delta_kl = beta * (-para./muls .+ (1-para)./(1-muls));
 %repmat(delta_kl, 1, size(a2)(2)) 
-delta2 =( (W2' * delta3) .+  repmat(delta_kl, 1, size(a2)(2))).* a2 .* (1 - a2)
+delta2 =( (W2' * delta3) .+  repmat(delta_kl, 1, size(a2)(2))).* a2 .* (1 - a2);
 %delta1 = W1' * delta2 .* a1 .* (1 - a1);
 %[1 2;2 2;3 2] + [1 2];
 
-W2grad = delta3 * a2'
-b2grad = sum(delta3, 2)
 
-W1grad = delta2 * a1'
-b1grad = sum(delta2, 2)
+%W2grad=delta3*active_value2'./data_size(2)+lambda.*W2;
+%W1grad=delta2*data'./data_size(2)+lambda.*W1;
+%b2grad=sum(delta3,2)./data_size(2);
+%b1grad=sum(delta2,2)./data_size(2);
+
+m = size(data)(2);
+W2grad = delta3 * a2' ./ m  + lambda .* W2;
+        %lack of generalizing
+b2grad = sum(delta3, 2) ./ m;
+
+W1grad = delta2 * a1' ./ m + lambda .* W1;
+b1grad = sum(delta2, 2) ./ m;
 
 %size(W1)
 %size(W1grad)
@@ -90,7 +98,7 @@ b1grad = sum(delta2, 2)
 % to a vector format (suitable for minFunc).  Specifically, we will unroll
 % your gradient matrices into a vector.
 
-grad = [W1grad(:) ; W2grad(:) ; b1grad(:) ; b2grad(:)]
+grad = [W1grad(:) ; W2grad(:) ; b1grad(:) ; b2grad(:)];
 %size(grad)
 
 end

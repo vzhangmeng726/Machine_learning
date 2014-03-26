@@ -39,8 +39,9 @@ if __name__ == '__main__':
     y = y[randind]
 
     print 'apriori is finding connection...'
-    ap = apriori.Apriori(map(set, x[y=='Entertainment News']), 0.04, 0.6)
-    print ap.freq_set()[0]
+#    ap = apriori.Apriori(map(set, x[y=='World News']), 0.04, 0.6)
+    ap = apriori.Apriori(map(set, x), 0.04, 0.8)
+    pprint(ap.freq_set()[0])
     ap.pprint_rules()
 
 

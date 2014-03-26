@@ -13,7 +13,7 @@ class PSO(object):
     def __init__(self, f, cmp_f, init_f,
         p_size, bound_f, vmax,
         w = 0.8, c1 = 2, c2 = 2, maxiter = 2000,
-        plot_f = None):
+        plot_f = None, init_x = None):
 
         pbest = [None] * p_size
         pbest_pos = [None] * p_size
@@ -21,8 +21,11 @@ class PSO(object):
         gbest_pos = None
         v = list(random.rand(p_size)*vmax)
         p = []       
-        for i in xrange(p_size):
-            p.append(init_f())
+        if init_x == None:
+            for i in xrange(p_size):
+                p.append(init_f())
+        else:
+            p = init_x
 
         for iteration in xrange(maxiter):
             for ind, ele in enumerate(p):
@@ -47,3 +50,8 @@ class PSO(object):
 #            print 'the %dth iter:\tbest fitness: f(' % iteration, gbest_pos, ')=',gbest
 
         print 'best fitness: f(', gbest_pos, ')=', gbest
+        self.gbest_pos = gbest_pos
+        self.gbest = gbest
+
+    def get_ans(self):
+        return self.gbest_pos, self.gbest

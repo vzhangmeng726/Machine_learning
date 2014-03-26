@@ -1,8 +1,9 @@
-
+from copy import deepcopy
 import matplotlib.pyplot as plt
 from time import sleep
 from numpy import *
 import ga
+import ga2
 
 DataSize = 0
 data = 0 
@@ -37,20 +38,105 @@ def tsp_gen_init():
     temp = random.permutation(DataSize)
     return temp                
 
+def tsp_mutation_hillclimb(base):
+    ori_fitness = tsp_fitness_f(base)
+    while True:
+#        posx = random.randint(0,len(base))
+#        posy = random.randint(0,len(base))
+#        t = copy(base[posx])
+#        base[posx] = copy(base[posy])
+#        base[posy] = copy(t)
+        base = tsp_gen_init()
 
+        if tsp_fitness_f(base)>ori_fitness:
+            break;
+    return base
+
+
+
+def tsp_mutation_f(base):
+#    if random.rand()<0.2: return tsp_gen_init()
+    for i in xrange(random.randint(0,len(base))):
+        posx = random.randint(0,len(base))
+        posy = random.randint(0,len(base))
+#        t = copy(base[posx])
+#        base[posx] = copy(base[posy])
+#        base[posy] = copy(t)
+
+        base[posx], base[posy] = base[posy], base[posx]
+
+    return base               
+
+def tsp_plot_f(route, clr = 'red', clean = False):
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111)
+#    plt.plot(route[:,0]+route[0,0], route[:,1]+route[-1,0], color='red', marker='x', ms=10 )
+    
+    px = []
+    py = []
+    for point in route:
+        px.append(data[point ,0])
+        py.append(data[point ,1])
+    px.append(data[route[0],0])
+    py.append(data[route[0],1]);
+
+    if clean:
+        plt.clf()
+    plt.plot(px, py , color=clr, marker='x', ms=10 )
+    plt.draw()
+#    sleep(0.1)
+
+#============================================================================
+#============================================================================
+#============================================================================
+#============================================================================
+#============================================================================
+    
 #ref = http://blog.csdn.net/xuyuanfan/article/details/6726477
-def tsp_crossover_f1(father, mother):
+def tsp_crossover_sgc(father, mother):
+    '''singal cross'''
     length = len(father)
-    cp = random.randint(0,length)
-    child = []
-    for ele in father[:cp+1]:
-        child.append(ele)
-    fa_genes = set(child)
+    cp = random.randint(0, length)
+    child1 = list(father[:cp])
+    child2 = list(mother[:cp])
     for ele in mother:
-        if not (ele in fa_genes):
-            child.append(ele)
-#    print father,'+',mother,'->',child
-    return child
+        if not ele in child1:
+            child1.append(ele)
+    for ele in father:
+        if not ele in child2:
+            child2.append(ele)
+    return child1, child2
+
+def tsp_crossover_pmx(father, mother):
+    '''pmx'''
+    length = len(father)
+    c1 = random.randint(0, length)
+    c2 = random.randint(0, length)
+    if c1 > c2:
+        c1, c2 = c2, c1
+    block1 = father[c1:c2+1]
+    block2 = mother[c1:c2+1]
+    d1 = dict(zip(block1, block2))
+    d2 = dict(zip(block2, block1))
+    child1 = deepcopy(father)
+    child1[c1:c2+1] = block2
+    child2 = deepcopy(mother)
+    child2[c1:c2+1] = block1
+    for i in xrange(length):
+        if i < c1 or i > c2:
+            if child1[i] in d2:
+                child1[i] = d2[child1[i]]
+            if child2[i] in d1:
+                child2[i] = d1[child2[i]]
+
+#    print '-' * 80
+#    print father, mother
+#    print c1, c2
+#    print child1, child2
+#    raw_input()
+
+    return child1, child2
+
 
 def tsp_crossover_HGA(father, mother):
     def swirl(route, pos):
@@ -75,62 +161,24 @@ def tsp_crossover_HGA(father, mother):
             swirl(mother, ind)
         if (dist(child[ind], father[ind+1]) < dist(child[ind], mother[ind+1])):
             child.append(father[ind+1])
+        
         else:
             child.append(mother[ind+1])
         ind += 1
     return child
 
+   
 def tsp_crossover_mixed(father, mather):
-    if random.rand()>0.4:
+    if random.rand()< 0.8:
         return tsp_crossover_HGA(father, mather)
     else:
-        return tsp_crossover_f1(father, mather)
+        return tsp_crossover_sgc(father, mather)
 
+#============================================================================
+#============================================================================
+#============================================================================
+#============================================================================
 
-def tsp_mutation_hillclimb(base):
-    ori_fitness = tsp_fitness_f(base)
-    while True:
-#        posx = random.randint(0,len(base))
-#        posy = random.randint(0,len(base))
-#        t = copy(base[posx])
-#        base[posx] = copy(base[posy])
-#        base[posy] = copy(t)
-        base = tsp_gen_init()
-
-        if tsp_fitness_f(base)>ori_fitness:
-            break;
-    return base
-
-
-
-def tsp_mutation_f(base):
-#    if random.rand()<0.2: return tsp_gen_init()
-    for i in xrange(random.randint(0,len(base))):
-        posx = random.randint(0,len(base))
-        posy = random.randint(0,len(base))
-        t = copy(base[posx])
-        base[posx] = copy(base[posy])
-        base[posy] = copy(t)
-    return base               
-
-def tsp_plot_f(route, clr = 'red', clean = False):
-#    fig = plt.figure()
-#    ax = fig.add_subplot(111)
-#    plt.plot(route[:,0]+route[0,0], route[:,1]+route[-1,0], color='red', marker='x', ms=10 )
-    
-    px = []
-    py = []
-    for point in route:
-        px.append(data[point ,0])
-        py.append(data[point ,1])
-    px.append(data[route[0],0])
-    py.append(data[route[0],1]);
-
-    if clean:
-        plt.clf()
-    plt.plot(px, py , color=clr, marker='x', ms=10 )
-    plt.draw()
-#    sleep(0.1)
 
 if __name__ == '__main__':
     global DataSize, data
@@ -145,8 +193,16 @@ if __name__ == '__main__':
 #    fig = plt.figure()
     plt.ion()
     plt.show()
+    plt.plot(1,1)
+    raw_input('sizing')
     
-    MyGA = ga.GA(tsp_fitness_f, {'fitness_thresold':0}, 300, tsp_gen_init,
+    '''    MyGA = ga.GA(tsp_fitness_f, {'fitness_thresold':0}, 300, tsp_gen_init,
         0.9, tsp_crossover_HGA, 0.3, tsp_mutation_f, True, tsp_plot_f, 10, lambda a,b: a<b)
-    MyGA.fit()
+    MyGA.fit()'''
 
+
+#    def __init__(self, fitness_f, terminator, generation_size, genertaion_init, 
+#        crossover_vs_survival, crossover_f, mutation_rate, mutation_f, plot = False, plot_f = None):
+    MyGA = ga2.GA(tsp_fitness_f, {'fitness_thresold':0}, 300, tsp_gen_init,
+                        0.95, tsp_crossover_HGA, 0.05, tsp_mutation_f, True, tsp_plot_f, 10, lambda a,b: a<b)
+    MyGA.fit()

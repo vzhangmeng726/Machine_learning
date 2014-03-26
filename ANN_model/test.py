@@ -1,5 +1,7 @@
-from ann import *
+import ann
+import pso_ann
 from numpy import *
+from cPickle import dump
 import os
 
 def  img2vector(filename):  
@@ -57,22 +59,30 @@ def testHandWritingClass():
     print "step 1: load data..."  
     train_x, train_y, test_x, test_y = loadDataSet()  
 
+    dump( (train_x, train_y, test_x, test_y), open('digit_data.dat', 'wb'),True)
+
+
 #    print train_x[0].shape
 #    print test_x[0].shape
   
     ## step 2: training...  
     print "step 2: training..."  
-    Classifier = NeuralNetworkClassifier(hidden_layers = [100] ,
+#=========================BP ANN======================================
+    Cl = ann.NeuralNetworkClassifier(hidden_layers = [10] ,
         method_specific_options = {'maxiter':100,'disp':True});
+#========================PSO ANN======================================
+#    Cl = pso_ann.PSO_ANN([10], p_size = 20, maxiter = 50, w = 1.2, c1 = 2, c2 = 2, vmax = 6)
+# 
+#=====================================================================
 
-    Classifier.fit(train_x, train_y);
-    pass  
-  
+    Cl.fit(train_x, train_y)
+#    print Cl.optimized_theta
+
     ## step 3: testing  
     print "step 3: testing..."  
     numTestSamples = test_x.shape[0]  
     matchCount = 0  
-    predict = Classifier.predict(test_x)
+    predict = Cl.predict(test_x)
     for i in xrange(numTestSamples):  
         if predict[i] == test_y[i]:  
             matchCount += 1  

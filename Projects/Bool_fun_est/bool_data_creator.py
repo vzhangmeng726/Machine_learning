@@ -47,10 +47,10 @@ class bool_equ(object):
 
 if __name__ == '__main__':
     
-    variables_size = 10
-    iteration_times = 18
+    variables_size = 20
+    iteration_times = 70
     equ_size = 1
-    data_mul = 500
+    data_mul = 2000
 
     x = []
     y = []

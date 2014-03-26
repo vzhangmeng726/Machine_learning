@@ -1,4 +1,4 @@
-visibleSize = 4 * 4;   % number of input units 
+visibleSize = 8 * 8;   % number of input units 
 hiddenSize = 25;     % number of hidden units 
 sparsityParam = 0.01;   % desired average activation of the hidden units.
                      % (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
@@ -21,14 +21,17 @@ theta = initializeParameters(hiddenSize, visibleSize);
 
 %%======================================================================
 %% STEP 2: Implement sparseAutoencoderCost
+
+
+[cost3, grad3] = ___sparseAutoencoderCost(theta, visibleSize, hiddenSize, lambda,...
+                                    sparsityParam, beta, patches);
+
 [cost, grad] = sparseAutoencoderCost(theta, visibleSize, hiddenSize, lambda, ...
                                      sparsityParam, beta, patches);
 
 
-[cost2, grad2] = ___sparseAutoencoderCost(theta, visibleSize, hiddenSize, lambda,...
+[cost2, grad2] = __sparseAutoencoderCost(theta, visibleSize, hiddenSize, lambda,...
                                     sparsityParam, beta, patches);
 
-[cost cost2]
-[grad grad2]
-
-
+[cost cost2 cost3]
+[grad grad2 grad3]

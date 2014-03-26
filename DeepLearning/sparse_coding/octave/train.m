@@ -14,8 +14,9 @@
 %  allow your sparse autoencoder to get good filters; you do not need to 
 %  change the parameters below.
 
-visibleSize = 4 * 4;   % number of input units 
-hiddenSize = 25;     % number of hidden units 
+patchlen = 16
+visibleSize = patchlen ** 2;   % number of input units 
+hiddenSize = 40;     % number of hidden units 
 sparsityParam = 0.01;   % desired average activation of the hidden units.
                      % (This was denoted by the Greek alphabet rho, which looks like a lower-case "p",
 		     %  in the lecture notes). 
@@ -28,7 +29,7 @@ beta = 3;            % weight of sparsity penalty term
 %  After implementing sampleIMAGES, the display_network command should
 %  display a random sample of 200 patches from the dataset
 
-patches = sampleIMAGES;
+patches = sampleIMAGES(patchlen);
 display_network(patches(:,randi(size(patches,2),200,1)),8);
 
 
@@ -62,7 +63,6 @@ theta = initializeParameters(hiddenSize, visibleSize);
 %  final submission of the visualized weights, please use parameters we 
 %  gave in Step 0 above.
 
-%print 'here'
 [cost, grad] = sparseAutoencoderCost(theta, visibleSize, hiddenSize, lambda, ...
                                      sparsityParam, beta, patches);
 
@@ -128,15 +128,16 @@ options.display = 'on';
 
 
 
-options = optimset('MaxIter', 100, 'GradObj', 'on');
+options = optimset('MaxIter', 2000, 'GradObj', 'on');
 
 % Minimize using fmincg
+'optimizing'
 opttheta = fmincg( @(p) sparseAutoencoderCost(p, ...
                                    visibleSize, hiddenSize, ...
                                    lambda, sparsityParam, ...
                                    beta, patches), ...
                               theta, options);
-
+'done'
 
 
 
@@ -144,7 +145,10 @@ opttheta = fmincg( @(p) sparseAutoencoderCost(p, ...
 %% STEP 5: Visualization 
 
 W1 = reshape(opttheta(1:hiddenSize*visibleSize), hiddenSize, visibleSize);
+%W2 = reshape(opttheta(hiddenSize*visibleSize+1:2*hiddenSize*visibleSize), visibleSize, hiddenSize);
+%W1 = reshape(opttheta(1:hiddenSize*visibleSize), hiddenSize, visibleSize);
 display_network(W1', 12); 
+%display_network(W2', 12);
 
 print -djpeg weights.jpg   % save the visualization to a file 
 
